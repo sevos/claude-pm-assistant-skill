@@ -1,44 +1,64 @@
 ---
-name: linear-pm
-description: Product Owner assistance for Linear ticket refinement, epic breakdown, dependency analysis, and backlog management. Use this skill when working with Linear tickets to create, analyze, propose amendments, or generate discussion questions. Best used alongside a Linear workspace with defined team prefixes and project names (e.g., team "AIA", project "Email parser").
+name: pm-assistant
+description: Product Owner assistance for ticket refinement, epic breakdown, dependency analysis, and backlog management across multiple project management systems. Use this skill when working with tickets to create, analyze, propose amendments, or generate discussion questions. Supports Linear, Jira, GitHub Issues, and other PM systems through extensible connectors.
 ---
 
-# Linear PM Skill
+# PM Assistant Skill
 
 ## Overview
 
-This skill enables Product Owner workflows within Linear:
+This skill enables Product Owner workflows across multiple project management systems:
 - Create and refine tickets with proper structure and acceptance criteria
 - Analyze tickets for gaps, clarity, completeness, and dependencies
 - Break down epics into actionable sub-tickets
 - Generate meaningful refinement session questions
 - Propose amendments based on conversation context
 
-The skill uses the connected Linear MCP server to directly query and mutate Linear data, and leverages LLM reasoning for analysis tasks.
+The skill automatically detects which PM system the project uses (Linear, Jira, GitHub, etc.) and applies the appropriate connector to query and mutate data. All analysis patterns and refinement workflows are system-agnostic and work consistently across platforms.
 
-## Getting Started: Team and Project Context
+## Getting Started: PM System Detection
 
-Before starting any Linear work, establish the workspace context:
+Before starting any work, the skill automatically establishes the PM system context:
 
-### 1. Discover or Provide Context
+### 1. PM System Detection
 
-The skill needs:
-- **Linear Team Prefix**: e.g., "AIA"
-- **Linear Project**: e.g., "Email parser"
+The skill detects which PM system the project uses by:
+1. **Checking for MCP servers** - Is Linear, Jira, GitHub, or other PM connector available?
+2. **Checking CLAUDE.md** - Does the project declare a PM system explicitly?
+3. **Asking the user** - If detection is ambiguous
 
-These may come from:
-- **CLAUDE.md file** in the project directory (recommended location)
-- **User input** if not available in files
-- **Linear discovery** if neither is explicitly provided
+### 2. PM System Configuration
 
-### 2. Linear MCP Server Discovery
+Configure the PM system in **CLAUDE.md** file in your project root:
 
-If context is not provided, the skill will:
-1. Use `mcp__linear-server__list_teams` to list available teams
-2. Use `mcp__linear-server__list_projects` to find the project
-3. Ask user to confirm the correct team/project before proceeding
+**Example for Linear**:
+```markdown
+# CLAUDE.md
 
-This ensures all operations are scoped to the correct workspace.
+## Project Management
+- **System**: Linear
+- **Team Prefix**: PROD
+- **Project**: Backend Services
+```
+
+**Example for Jira**:
+```markdown
+# CLAUDE.md
+
+## Project Management
+- **System**: Jira
+- **Instance**: https://company.atlassian.net
+- **Project**: BACKEND
+```
+
+### 3. Connector-Specific Discovery
+
+Once the PM system is detected, the skill loads the appropriate connector from `connectors/` (e.g., `connectors/linear.md`, `connectors/jira.md`). The connector handles:
+- Finding team/project context specific to that system
+- Discovering available workspaces, teams, or projects
+- Asking user to confirm if multiple options exist
+
+This ensures all operations are scoped to the correct workspace for the detected PM system.
 
 ## Core Capabilities
 
@@ -52,12 +72,12 @@ This ensures all operations are scoped to the correct workspace.
 3. Structure as simple or complex ticket based on scope
 4. Apply appropriate type labels (Feature, Bug, Enhancement, etc.)
 5. Present proposal to user for review
-6. **After user confirmation**: Create ticket using `mcp__linear-server__create_issue`
+6. **After user confirmation**: Create ticket using the loaded PM connector
 7. Report created ticket with ID and link
 
 **Guidelines**:
 - Refer to `references/ticket_structure_guide.md` for formatting standards
-- Use `references/mcp_linear_tools.md` for API details
+- Use `connectors/{system}.md` for PM system-specific API details
 - Include acceptance criteria for complex work
 - Flag open questions when scope is unclear
 - Suggest dependencies if work relates to existing tickets
@@ -67,7 +87,7 @@ This ensures all operations are scoped to the correct workspace.
 **Scenario**: "Are there any wrong assumptions in the ticket?" or "Based on the conversation transcript suggest adjustments to epic XXX-123"
 
 **Process**:
-1. Fetch existing ticket/epic using `mcp__linear-server__get_issue`
+1. Fetch existing ticket/epic using the loaded PM connector
 2. Analyze current state (description, acceptance criteria, scope)
 3. Cross-reference with provided context (code, conversation, etc.)
 4. Use patterns from `references/analysis_patterns.md` to identify:
@@ -79,7 +99,7 @@ This ensures all operations are scoped to the correct workspace.
    - "Current state" (quote from ticket)
    - "Suggested changes" (with rationale)
    - "Questions for team" (if needed)
-6. **After user confirmation**: Update ticket using `mcp__linear-server__update_issue`
+6. **After user confirmation**: Update ticket using the loaded PM connector
 7. Report changes applied
 
 **Guidelines**:
@@ -93,7 +113,7 @@ This ensures all operations are scoped to the correct workspace.
 **Scenario**: "Review existing Linear tickets for completeness, clarity, dependencies, open questions" for range AIA-100 through AIA-110
 
 **Process**:
-1. Fetch all tickets in range using `mcp__linear-server__list_issues` with appropriate filters
+1. Fetch all tickets in range using the loaded PM connector with appropriate filters
 2. For each ticket, evaluate against criteria:
    - **Clarity**: Title, description, acceptance criteria
    - **Completeness**: All required fields, edge cases covered
@@ -121,8 +141,8 @@ This ensures all operations are scoped to the correct workspace.
 **Scenario**: "Identify gaps in the planned tickets for epic XXX-123"
 
 **Process**:
-1. Fetch epic using `mcp__linear-server__get_issue`
-2. Query subtickets: `mcp__linear-server__list_issues` with filter `parent:"XXX-123"`
+1. Fetch epic using the loaded PM connector
+2. Query subtickets using the connector's hierarchy query (e.g., filter `parent:"XXX-123"`)
 3. Analyze epic scope vs. ticket coverage using `references/analysis_patterns.md` Pattern 1:
    - Frontend/UI components
    - Backend services and APIs
@@ -135,7 +155,7 @@ This ensures all operations are scoped to the correct workspace.
    - Suggested new tickets for each gap
    - Estimated scope per gap
 5. Ask: "Would you like me to create tickets for these gaps?"
-6. **After user confirmation**: Create tickets using `mcp__linear-server__create_issue`
+6. **After user confirmation**: Create tickets using the loaded PM connector
 
 **Guidelines**:
 - Be thorough but realistic (not everything needs a separate ticket)
@@ -171,7 +191,7 @@ This ensures all operations are scoped to the correct workspace.
 **Scenario**: "Generate questions for the next refinement session for tickets XXX-100 through XXX-110"
 
 **Process**:
-1. Fetch ticket range using `mcp__linear-server__list_issues` with filters
+1. Fetch ticket range using the loaded PM connector with appropriate filters
 2. Analyze each ticket for uncertainty patterns:
    - Missing acceptance criteria
    - Ambiguous requirements
@@ -207,7 +227,7 @@ This ensures all operations are scoped to the correct workspace.
 
 **For analysis workflows**:
 - `references/analysis_patterns.md` - Detailed patterns for gaps, assumptions, dependencies, clarity, refinement
-- `references/mcp_linear_tools.md` - Complete Linear MCP tool reference
+- `connectors/{system}.md` - PM system-specific tool reference (e.g., `connectors/linear.md`)
 
 **For refinement sessions**:
 - `references/refinement_session_guide.md` - Question generation, facilitation, templates
@@ -249,10 +269,9 @@ All creation and amendment operations follow this pattern:
 - Re-present adjusted version for confirmation
 
 ### Step 5: Apply Changes
-- Use Linear MCP tools to create/update
-- `mcp__linear-server__create_issue` for new tickets
-- `mcp__linear-server__update_issue` for amendments
-- Include team/project context in all operations
+- Use the loaded PM connector to create/update
+- Call connector-specific create/update functions
+- Include team/project context in all operations (per connector requirements)
 
 ### Step 6: Report Results
 - Confirm what was created/updated
@@ -261,11 +280,12 @@ All creation and amendment operations follow this pattern:
 
 ## Best Practices
 
-### Team and Project Scoping
-- **Always verify** team prefix and project before operations
-- **Check CLAUDE.md** in project directory for context
-- **Discover from Linear** if not explicitly provided
-- **Filter all queries** to correct team and project
+### PM System and Project Scoping
+- **Always detect** the PM system (MCP server, CLAUDE.md, or ask user)
+- **Check CLAUDE.md** in project directory for explicit system configuration
+- **Load the correct connector** for the detected system
+- **Discover team/project context** using the connector's discovery functions
+- **Filter all queries** to correct team and project per the connector's requirements
 
 ### Ticket Quality
 - Read `references/ticket_structure_guide.md` for quality standards
@@ -288,8 +308,8 @@ All creation and amendment operations follow this pattern:
 - Offer revision if user suggests changes
 - Re-present for approval after revisions
 
-### Linear MCP Usage
-- Refer to `references/mcp_linear_tools.md` for complete tool reference
-- Use filters appropriately (team, project, status, etc.)
-- Handle errors gracefully (e.g., "Project not found, please verify team/project")
+### PM Connector Usage
+- Refer to `connectors/{system}.md` for complete tool reference for the detected system
+- Use filters appropriately (per the connector's query syntax)
+- Handle errors gracefully (following connector-specific error handling guidance)
 - Respect rate limits and batch operations when possible

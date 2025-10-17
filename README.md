@@ -1,10 +1,10 @@
-# Claude Linear PM Skill
+# Claude PM Assistant Skill
 
-AI-powered Product Owner assistance for Linear ticket management and refinement.
+AI-powered Product Owner assistance for ticket management and refinement across multiple project management systems.
 
 ## What It Does
 
-When you work with Linear tickets, this Skill automatically activates to help you:
+When you work with tickets in Linear, Jira, GitHub Issues, or other supported PM systems, this Skill automatically activates to help you:
 
 - **Create tickets** — Draft well-structured tickets with acceptance criteria from conversations
 - **Analyze tickets** — Review for completeness, clarity, gaps, and dependencies
@@ -12,6 +12,11 @@ When you work with Linear tickets, this Skill automatically activates to help yo
 - **Identify gaps** — Find missing coverage when breaking down epics
 - **Generate questions** — Create structured refinement session discussion points
 - **Plan work** — Suggest parallelization strategies and dependency analysis
+
+## Supported PM Systems
+
+- **Linear** (fully supported)
+- Future systems (Jira, GitHub Issues, Azure Boards, etc.) via extensible connector framework
 
 ## Setup
 
@@ -28,26 +33,28 @@ Add to your Claude Code configuration at `~/.claude/config.json`:
 }
 ```
 
-### 2. Configure Linear MCP Server
+### 2. Configure Your PM System
+
+**For Linear**:
 Follow the [Linear MCP documentation](https://linear.app/docs/mcp) to set up the MCP server and authenticate with Linear.
 
-### 3. Add Project Context (Optional)
-Create `CLAUDE.md` in your project root to establish default team and project context:
+**For other systems**:
+Follow the appropriate MCP or API documentation for your PM system (Jira, GitHub, etc.).
 
+### 3. Add Project Context (Recommended)
+Create `CLAUDE.md` in your project root to establish default PM system and project context:
+
+**Example for Linear**:
 ```markdown
 # CLAUDE.md
 
 ## Project Management
-
-### Linear Team
+- **System**: Linear
 - **Team Prefix**: PROD
-
-### Linear Projects
-- **Backend Services** - https://linear.app/yourworkspace/project/backend-services-abc123
-- **Frontend UI** - https://linear.app/yourworkspace/project/frontend-ui-def456
+- **Project**: Backend Services
 ```
 
-The skill will use these settings for all Linear operations in the project.
+The skill will use these settings for all operations in the project.
 
 ## How to Use
 
@@ -76,25 +83,28 @@ The Skill will:
 
 - **SKILL.md** — Complete workflow guide and patterns
 - **assets/ticket_template.md** — Ready-to-use templates
-- **references/ticket_structure_guide.md** — Quality standards
+- **references/ticket_structure_guide.md** — Quality standards (system-agnostic)
 - **references/analysis_patterns.md** — Six analysis workflows with examples
-- **references/mcp_linear_tools.md** — Linear MCP API reference
 - **references/refinement_session_guide.md** — Refinement best practices
+- **connectors/linear.md** — Linear MCP API reference and operations
+- **connectors/README.md** — Connector interface and extensibility guide
 
 ## Key Principles
 
+✅ **Extensible architecture** — Linear-specific code isolated in connectors; ready for Jira, GitHub, etc. in future
 ✅ **Always proposes before acting** — Shows changes for your review
 ✅ **Requires explicit confirmation** — Never assumes approval
-✅ **Respects scope** — Filters to correct team and project
 ✅ **Specific and quoted** — References exact text when identifying issues
 ✅ **Explains rationale** — Shows why changes matter
+✅ **Reusable patterns** — Analysis and refinement workflows system-agnostic
 
 ## Troubleshooting
 
 | Problem | Solution |
 |---------|----------|
-| Skill not activating | Explicitly ask to use the linear-pm skill: "Use the linear-pm skill to review these tickets..." |
-| Team/project not found | Add a `CLAUDE.md` file to your project with team prefix and project links (see Setup step 3) |
+| Skill not activating | Explicitly ask: "Use the pm-assistant skill to review these tickets..." |
+| Team/project not found | Add a `CLAUDE.md` file with Linear team and project (see Setup step 3) |
+| Can't find tickets | Verify Linear is configured correctly in CLAUDE.md and MCP server is authenticated |
 
 ---
 
