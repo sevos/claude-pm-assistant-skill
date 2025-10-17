@@ -77,7 +77,7 @@ Each connector should be a markdown reference file in `connectors/` with:
 
 - **linear.md** - Linear MCP server connector (currently implemented)
 - **local-markdown.md** - Local markdown files in docs/tickets/ (currently implemented)
-  - **local-markdown/quickstart.md** - Quick start guide and common operations
+  - **local-markdown/setup.md** - Setup instructions
 - **jira.md** (future) - Jira Cloud API connector
 - **github.md** (future) - GitHub Issues API connector
 - **azure-boards.md** (future) - Azure Boards connector

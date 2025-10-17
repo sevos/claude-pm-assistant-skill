@@ -496,10 +496,10 @@ python scripts/markdown_tickets.py search "query text"
 python scripts/markdown_tickets.py analyze-dependencies
 ```
 
-## Quick Start
+## Setup
 
-For a 5-minute setup and common operations, see:
-- **`connectors/local-markdown/quickstart.md`** - Getting started guide with examples
+For installation and setup instructions, see:
+- **`connectors/local-markdown/setup.md`** - Step-by-step setup guide
 
 ## Notes
 
