@@ -87,6 +87,9 @@ The Skill will:
 - **references/analysis_patterns.md** — Six analysis workflows with examples
 - **references/refinement_session_guide.md** — Refinement best practices
 - **connectors/linear.md** — Linear MCP API reference and operations
+- **connectors/local-markdown.md** — Local Markdown connector documentation
+  - **connectors/local-markdown/quickstart.md** — Quick start guide for local markdown setup
+  - **connectors/local-markdown/implementation.md** — Implementation details and test results
 - **connectors/README.md** — Connector interface and extensibility guide
 
 ## Key Principles

@@ -76,6 +76,9 @@ Each connector should be a markdown reference file in `connectors/` with:
 ### Example Connectors
 
 - **linear.md** - Linear MCP server connector (currently implemented)
+- **local-markdown.md** - Local markdown files in docs/tickets/ (currently implemented)
+  - **local-markdown/quickstart.md** - Quick start guide and common operations
+  - **local-markdown/implementation.md** - Architecture, design decisions, and validation
 - **jira.md** (future) - Jira Cloud API connector
 - **github.md** (future) - GitHub Issues API connector
 - **azure-boards.md** (future) - Azure Boards connector
@@ -103,16 +106,16 @@ Example detection pattern:
 
 Each connector should define how it maps generic PM concepts to its system:
 
-| Generic Concept | Linear | Jira | GitHub |
-|---|---|---|---|
-| Team/Project | Team + Project | Project + Boards | Organization + Repository |
-| Issue Type | Label (Type/*) | Issue Type | Issue or Discussion |
-| Sprint/Cycle | Cycle | Sprint | Milestone |
-| Epic/Parent | Parent issue | Epic | Milestone/Project v2 |
-| Sub-task | Sub-ticket | Sub-task | Nested issue (linked) |
-| Dependency | Blocks/Blocked-by | Link (depends on, blocks) | Link (dependency) |
-| Status | State | Status | State (Open, Closed) |
-| Label | Label | Label | Label |
+| Generic Concept | Linear | Local-Markdown | Jira | GitHub |
+|---|---|---|---|---|
+| Team/Project | Team + Project | Implicit in directory | Project + Boards | Organization + Repository |
+| Issue Type | Label (Type/*) | Type field | Issue Type | Issue or Discussion |
+| Sprint/Cycle | Cycle | (not supported) | Sprint | Milestone |
+| Epic/Parent | Parent issue | Parent field | Epic | Milestone/Project v2 |
+| Sub-task | Sub-ticket | Parent field | Sub-task | Nested issue (linked) |
+| Dependency | Blocks/Blocked-by | Blocks/Blocked-by fields | Link (depends on, blocks) | Link (dependency) |
+| Status | State | Status field | Status | State (Open, Closed) |
+| Label | Label | Labels array | Label | Label |
 
 ## Implementation Notes
 

@@ -1,6 +1,6 @@
 ---
 name: pm-assistant
-description: Product Owner assistance for ticket refinement, epic breakdown, dependency analysis, and backlog management across multiple project management systems. Use this skill when working with tickets to create, analyze, propose amendments, or generate discussion questions. Supports Linear, Jira, GitHub Issues, and other PM systems through extensible connectors.
+description: Product Owner assistance for ticket refinement, epic breakdown, dependency analysis, and backlog management across multiple project management systems. Use this skill when working with tickets to create, analyze, propose amendments, or generate discussion questions. Supports Linear, Local Markdown, Jira, GitHub Issues, and other PM systems through extensible connectors.
 ---
 
 # PM Assistant Skill
@@ -14,7 +14,7 @@ This skill enables Product Owner workflows across multiple project management sy
 - Generate meaningful refinement session questions
 - Propose amendments based on conversation context
 
-The skill automatically detects which PM system the project uses (Linear, Jira, GitHub, etc.) and applies the appropriate connector to query and mutate data. All analysis patterns and refinement workflows are system-agnostic and work consistently across platforms.
+The skill automatically detects which PM system the project uses (Linear, Local Markdown, Jira, GitHub, etc.) and applies the appropriate connector to query and mutate data. All analysis patterns and refinement workflows are system-agnostic and work consistently across platforms.
 
 ## Getting Started: PM System Detection
 
@@ -25,7 +25,8 @@ Before starting any work, the skill automatically establishes the PM system cont
 The skill detects which PM system the project uses by:
 1. **Checking for MCP servers** - Is Linear, Jira, GitHub, or other PM connector available?
 2. **Checking CLAUDE.md** - Does the project declare a PM system explicitly?
-3. **Asking the user** - If detection is ambiguous
+3. **Checking for docs/tickets directory** - Does Local Markdown tickets directory exist?
+4. **Asking the user** - If detection is ambiguous
 
 ### 2. PM System Configuration
 
@@ -51,9 +52,18 @@ Configure the PM system in **CLAUDE.md** file in your project root:
 - **Project**: BACKEND
 ```
 
+**Example for Local Markdown**:
+```markdown
+# CLAUDE.md
+
+## Project Management
+- **System**: Local-Markdown
+- **Directory**: docs/tickets
+```
+
 ### 3. Connector-Specific Discovery
 
-Once the PM system is detected, the skill loads the appropriate connector from `connectors/` (e.g., `connectors/linear.md`, `connectors/jira.md`). The connector handles:
+Once the PM system is detected, the skill loads the appropriate connector from `connectors/` (e.g., `connectors/linear.md`, `connectors/local-markdown.md`, `connectors/jira.md`). The connector handles:
 - Finding team/project context specific to that system
 - Discovering available workspaces, teams, or projects
 - Asking user to confirm if multiple options exist
@@ -227,7 +237,11 @@ This ensures all operations are scoped to the correct workspace for the detected
 
 **For analysis workflows**:
 - `references/analysis_patterns.md` - Detailed patterns for gaps, assumptions, dependencies, clarity, refinement
-- `connectors/{system}.md` - PM system-specific tool reference (e.g., `connectors/linear.md`)
+- `connectors/{system}.md` - PM system-specific tool reference:
+  - `connectors/linear.md` - Linear MCP API reference
+  - `connectors/local-markdown.md` - Local Markdown connector documentation
+    - `connectors/local-markdown/quickstart.md` - Quick start guide
+    - `connectors/local-markdown/implementation.md` - Implementation details
 
 **For refinement sessions**:
 - `references/refinement_session_guide.md` - Question generation, facilitation, templates
