@@ -496,11 +496,10 @@ python scripts/markdown_tickets.py search "query text"
 python scripts/markdown_tickets.py analyze-dependencies
 ```
 
-## Additional Documentation
+## Quick Start
 
-For more details on using the local-markdown connector, see:
-- **Quick Start Guide**: `connectors/local-markdown/quickstart.md` - 5-minute setup and common operations
-- **Implementation Details**: `connectors/local-markdown/implementation.md` - Architecture, design decisions, and test results
+For a 5-minute setup and common operations, see:
+- **`connectors/local-markdown/quickstart.md`** - Getting started guide with examples
 
 ## Notes
 

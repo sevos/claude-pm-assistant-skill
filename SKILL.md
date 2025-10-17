@@ -241,7 +241,6 @@ This ensures all operations are scoped to the correct workspace for the detected
   - `connectors/linear.md` - Linear MCP API reference
   - `connectors/local-markdown.md` - Local Markdown connector documentation
     - `connectors/local-markdown/quickstart.md` - Quick start guide
-    - `connectors/local-markdown/implementation.md` - Implementation details
 
 **For refinement sessions**:
 - `references/refinement_session_guide.md` - Question generation, facilitation, templates
