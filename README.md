@@ -21,17 +21,21 @@ When you work with tickets in Linear, Jira, GitHub Issues, or other supported PM
 ## Setup
 
 ### 1. Install the Skill
-Add to your Claude Code configuration at `~/.claude/config.json`:
 
-```json
-{
-  "skills": [
-    {
-      "path": "/path/to/claude-linear-pm-skill"
-    }
-  ]
-}
+**Option A: User-level installation** (available in all projects)
+```bash
+# Clone the skill to your Claude skills directory
+git clone https://github.com/sevos/claude-pm-assistant-skill.git ~/.claude/skills/pm-assistant
 ```
+
+**Option B: Project-level installation** (specific to one project)
+```bash
+# Clone the skill to your project's Claude directory
+cd /path/to/your/project
+git clone https://github.com/sevos/claude-pm-assistant-skill.git .claude/skills/pm-assistant
+```
+
+After installation, restart Claude Code to load the skill.
 
 ### 2. Configure Your PM System
 
