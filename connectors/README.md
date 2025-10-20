@@ -11,10 +11,11 @@ Each connector must implement the following operations to be compatible with the
 Every connector file should document and implement these core operations:
 
 #### 1. Discovery: Establish Team and Project Context
-- Detect if the project uses this PM system (MCP server, config file, user input)
+- Detect if the project uses this PM system (MCP server, config file, or AskUserQuestion tool)
 - Find team/project identifiers
 - Retrieve available workspaces, teams, or projects
 - Get current user information
+- Use AskUserQuestion tool when multiple teams/projects exist
 
 #### 2. Query: Search and Filter Issues
 - Implement system-specific query syntax (filters, JQL, GraphQL, etc.)
@@ -97,7 +98,7 @@ Example detection pattern:
 
 1. Check for available MCP servers
 2. Check CLAUDE.md for explicit system declaration
-3. Ask user if ambiguous
+3. Use AskUserQuestion tool if ambiguous (see SKILL.md "Using AskUserQuestion for User Input")
 4. Load connector reference from `connectors/{system}.md`
 ```
 

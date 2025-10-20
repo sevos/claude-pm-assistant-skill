@@ -26,7 +26,7 @@ The skill detects which PM system the project uses by:
 1. **Checking for MCP servers** - Is Linear, Jira, GitHub, or other PM connector available?
 2. **Checking CLAUDE.md** - Does the project declare a PM system explicitly?
 3. **Checking for docs/tickets directory** - Does Local Markdown tickets directory exist?
-4. **Asking the user** - If detection is ambiguous
+4. **Using AskUserQuestion tool** - If detection is ambiguous (see "Using AskUserQuestion for User Input" section)
 
 ### 2. PM System Configuration
 
@@ -66,7 +66,7 @@ Configure the PM system in **CLAUDE.md** file in your project root:
 Once the PM system is detected, the skill loads the appropriate connector from `connectors/` (e.g., `connectors/linear.md`, `connectors/local-markdown.md`, `connectors/jira.md`). The connector handles:
 - Finding team/project context specific to that system
 - Discovering available workspaces, teams, or projects
-- Asking user to confirm if multiple options exist
+- Using AskUserQuestion tool if multiple options exist (see "Using AskUserQuestion for User Input" section)
 
 This ensures all operations are scoped to the correct workspace for the detected PM system.
 
@@ -82,8 +82,9 @@ This ensures all operations are scoped to the correct workspace for the detected
 3. Structure as simple or complex ticket based on scope
 4. Apply appropriate type labels (Feature, Bug, Enhancement, etc.)
 5. Present proposal to user for review
-6. **After user confirmation**: Create ticket using the loaded PM connector
-7. Report created ticket with ID and link
+6. **Use AskUserQuestion tool for confirmation**: Wait for explicit approval before proceeding
+7. **After user confirms**: Create ticket using the loaded PM connector
+8. Report created ticket with ID and link
 
 **Guidelines**:
 - Refer to `references/ticket_structure_guide.md` for formatting standards
@@ -109,14 +110,15 @@ This ensures all operations are scoped to the correct workspace for the detected
    - "Current state" (quote from ticket)
    - "Suggested changes" (with rationale)
    - "Questions for team" (if needed)
-6. **After user confirmation**: Update ticket using the loaded PM connector
-7. Report changes applied
+6. **Use AskUserQuestion tool for confirmation**: Wait for explicit approval before proceeding
+7. **After user confirms**: Update ticket using the loaded PM connector
+8. Report changes applied
 
 **Guidelines**:
 - Be specific: quote the problematic text
 - Explain the "why" behind each suggested change
 - Distinguish between critical (must fix) and nice-to-have improvements
-- Ask clarifying questions if context is ambiguous
+- Use AskUserQuestion tool if context is ambiguous or requires clarification
 
 ### 3. Analyze Tickets for Quality
 
@@ -164,8 +166,8 @@ This ensures all operations are scoped to the correct workspace for the detected
    - Identified gaps with context
    - Suggested new tickets for each gap
    - Estimated scope per gap
-5. Ask: "Would you like me to create tickets for these gaps?"
-6. **After user confirmation**: Create tickets using the loaded PM connector
+5. **Use AskUserQuestion tool for confirmation**: Present options to create all tickets, select specific ones, or review proposals first
+6. **After user confirms**: Create tickets using the loaded PM connector
 
 **Guidelines**:
 - Be thorough but realistic (not everything needs a separate ticket)
@@ -274,12 +276,13 @@ All creation and amendment operations follow this pattern:
 - Show "current state" and "proposed state" for amendments
 - Show "proposed ticket" for new tickets
 - Include rationale for each decision
-- Ask clarifying questions if needed
+- Use AskUserQuestion tool if clarification is needed
 
 ### Step 4: Wait for Confirmation
-- **Do not proceed** until user explicitly confirms
+- **Use AskUserQuestion tool** to get explicit user confirmation before proceeding
+- **Do not proceed** until user confirms via the tool response
 - Offer to adjust draft if user suggests changes
-- Re-present adjusted version for confirmation
+- Re-present adjusted version and confirm again using AskUserQuestion
 
 ### Step 5: Apply Changes
 - Use the loaded PM connector to create/update
@@ -294,10 +297,11 @@ All creation and amendment operations follow this pattern:
 ## Best Practices
 
 ### PM System and Project Scoping
-- **Always detect** the PM system (MCP server, CLAUDE.md, or ask user)
+- **Always detect** the PM system (MCP server, CLAUDE.md, or use AskUserQuestion tool)
 - **Check CLAUDE.md** in project directory for explicit system configuration
 - **Load the correct connector** for the detected system
 - **Discover team/project context** using the connector's discovery functions
+- **Use AskUserQuestion tool** if multiple teams/projects found and context is ambiguous
 - **Filter all queries** to correct team and project per the connector's requirements
 
 ### Ticket Quality
@@ -316,13 +320,132 @@ All creation and amendment operations follow this pattern:
 
 ### User Confirmation Protocol
 - Always show proposals before applying
-- Wait for explicit user confirmation
+- **Use AskUserQuestion tool** to get explicit user confirmation with clear options
+- Wait for confirmation response from the tool before proceeding
 - Never assume approval
 - Offer revision if user suggests changes
-- Re-present for approval after revisions
+- Re-present for approval after revisions (using AskUserQuestion again)
 
 ### PM Connector Usage
 - Refer to `connectors/{system}.md` for complete tool reference for the detected system
 - Use filters appropriately (per the connector's query syntax)
 - Handle errors gracefully (following connector-specific error handling guidance)
 - Respect rate limits and batch operations when possible
+
+## Using AskUserQuestion for User Input
+
+When user input is required during workflow execution, use the **AskUserQuestion** tool to present structured options. This ensures clear, actionable choices and reduces ambiguity.
+
+### When to Use AskUserQuestion
+
+Use the tool for:
+1. **PM system/project detection** - When multiple teams or projects exist and context is ambiguous
+2. **Clarifying questions during analysis** - When requirements, scope, or context needs clarification
+3. **Confirmation before actions** - Before creating or updating tickets in the PM system
+
+Do NOT use for:
+- Open-ended conversational follow-ups ("What would you like to do next?")
+- Refinement session questions (those are for human facilitators)
+
+### Example 1: PM System Detection (Multiple Teams Available)
+
+**Scenario**: Multiple Linear teams found, need to determine which one to use.
+
+```
+Use AskUserQuestion tool with:
+{
+  "questions": [{
+    "question": "Multiple Linear teams found in your workspace. Which team should I use for this project?",
+    "header": "Team Selection",
+    "multiSelect": false,
+    "options": [
+      {
+        "label": "PROD - Product Team",
+        "description": "Main product development team (15 active issues)"
+      },
+      {
+        "label": "ENG - Engineering Platform",
+        "description": "Infrastructure and platform team (8 active issues)"
+      },
+      {
+        "label": "DESIGN - Design System",
+        "description": "Design system and component library team (5 active issues)"
+      }
+    ]
+  }]
+}
+```
+
+### Example 2: Clarifying Requirements During Analysis
+
+**Scenario**: Analyzing a ticket but scope is ambiguous between two interpretations.
+
+```
+Use AskUserQuestion tool with:
+{
+  "questions": [{
+    "question": "The ticket mentions 'email notifications' but doesn't specify the scope. What should be included?",
+    "header": "Scope",
+    "multiSelect": true,
+    "options": [
+      {
+        "label": "Digest emails",
+        "description": "Scheduled summary emails sent daily/weekly"
+      },
+      {
+        "label": "Real-time notifications",
+        "description": "Immediate emails when events occur"
+      },
+      {
+        "label": "Transactional emails",
+        "description": "System-triggered emails (password reset, confirmations)"
+      }
+    ]
+  }]
+}
+```
+
+### Example 3: Confirming Before Creating Tickets
+
+**Scenario**: Identified 3 gaps in epic coverage, ready to create tickets.
+
+```
+Use AskUserQuestion tool with:
+{
+  "questions": [{
+    "question": "I've identified 3 missing tickets for the email digest epic. Should I create them?",
+    "header": "Create Tickets",
+    "multiSelect": false,
+    "options": [
+      {
+        "label": "Create all 3 tickets",
+        "description": "Create tickets for: UI preferences component, end-to-end testing, and scheduled job setup"
+      },
+      {
+        "label": "Show me the proposals first",
+        "description": "Present detailed ticket proposals for review before creating"
+      },
+      {
+        "label": "Create only high-priority ones",
+        "description": "Create tickets for UI component and testing, defer infrastructure work"
+      }
+    ]
+  }]
+}
+```
+
+### Guidelines for Effective Questions
+
+**Structure**:
+- Use clear, specific question text
+- Provide 2-4 options (not just yes/no when possible)
+- Include descriptions explaining what each option means
+- Use `multiSelect: true` only when choices are not mutually exclusive
+
+**Headers**:
+- Keep short (max 12 chars): "Team", "Scope", "Approach", "Confirm"
+- Describes the decision type
+
+**Options**:
+- Label: Concise choice (1-5 words)
+- Description: Explain implications or what happens if chosen

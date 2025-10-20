@@ -12,7 +12,7 @@ To detect if a project uses Linear:
 
 1. **Check for MCP server**: Is `mcp__linear-server__get_user` available?
 2. **Check CLAUDE.md**: Does project define `System: Linear`?
-3. **Ask user**: If neither is conclusive
+3. **Use AskUserQuestion tool**: If neither is conclusive (see SKILL.md "Using AskUserQuestion for User Input")
 
 ### Example CLAUDE.md Configuration
 
@@ -40,7 +40,7 @@ To detect if a project uses Linear:
 1. Check CLAUDE.md for explicit configuration
 2. If not found, call `mcp__linear-server__list_teams` to list available teams
 3. Call `mcp__linear-server__list_projects` to find the project
-4. Ask user to confirm if multiple options exist
+4. Use AskUserQuestion tool if multiple options exist (present team/project choices with descriptions)
 
 **Functions**:
 ```
@@ -252,8 +252,8 @@ mcp__linear-server__create_comment
 ```
 1. Fetch existing ticket with get_issue
 2. Present proposal to user
-3. Wait for user confirmation
-4. Call update_issue with changes after confirmation
+3. Use AskUserQuestion tool to get explicit confirmation
+4. Call update_issue with changes after user confirms via tool
 5. Report what was updated
 ```
 
@@ -269,7 +269,7 @@ mcp__linear-server__create_comment
 **Approach**:
 - Always validate team/project context before operations
 - Provide specific error messages with remediation steps
-- If ambiguous, ask user to confirm context before proceeding
+- If ambiguous, use AskUserQuestion tool to confirm context before proceeding
 
 ## Notes
 
@@ -277,4 +277,4 @@ mcp__linear-server__create_comment
 - Descriptions support Markdown formatting
 - Acceptance criteria should be formatted as checkboxes or Given-When-Then
 - Always verify team/project before bulk operations
-- For large operations, confirm with user before proceeding
+- For large operations, use AskUserQuestion tool to confirm with user before proceeding

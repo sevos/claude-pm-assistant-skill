@@ -17,7 +17,7 @@ To detect if a project uses local-markdown:
 
 1. **Check CLAUDE.md**: Does project define `System: Local-Markdown`?
 2. **Check for docs/tickets directory**: Does `docs/tickets/` exist?
-3. **Ask user**: If neither is conclusive
+3. **Use AskUserQuestion tool**: If neither is conclusive (see SKILL.md "Using AskUserQuestion for User Input")
 
 ### Example CLAUDE.md Configuration
 
@@ -468,7 +468,7 @@ EOF
 
 1. Check for `CLAUDE.md` with `System: Local-Markdown`
 2. Check for `docs/tickets/` directory
-3. Ask user if ambiguous
+3. Use AskUserQuestion tool if ambiguous
 
 ### SKILL.md Workflow Modifications
 

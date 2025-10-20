@@ -93,7 +93,7 @@ Analysis tasks leverage LLM reasoning to:
    - Flag each mismatch clearly
    - Explain impact on implementation
    - Suggest updated acceptance criteria or requirements
-   - Ask: "Should we update the ticket or is there missing context?"
+   - Use AskUserQuestion tool to confirm: "Should we update the ticket or is there missing context?"
 
 ### Example Mismatch Detection
 
@@ -348,7 +348,7 @@ Dependencies or blockers discovered:
 - Existing patterns in ticket structure (to match style)
 
 **When unsure**:
-- Ask clarifying questions
+- Use AskUserQuestion tool for clarifying questions
 - Flag as open question for refinement
 - Suggest options with trade-offs
 - Don't assume team preferences or standards
